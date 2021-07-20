@@ -213,6 +213,7 @@ class MasterSuite extends SparkFunSuite
       memory = 0,
       endpoint = null,
       webUiAddress = "http://localhost:80",
+      true,
       Map.empty
     )
 
@@ -712,7 +713,7 @@ class MasterSuite extends SparkFunSuite
     val mockAddress = mock(classOf[RpcAddress])
     when(endpointRef.address).thenReturn(mockAddress)
     new WorkerInfo(workerId, "host", 100, cores, memoryMb,
-      endpointRef, "http://localhost:80", Map.empty)
+      endpointRef, "http://localhost:80", true, Map.empty)
   }
 
   private def scheduleExecutorsOnWorkers(
@@ -744,7 +745,8 @@ class MasterSuite extends SparkFunSuite
       10,
       1024,
       "http://localhost:8080",
-      RpcAddress("localhost", 9999)))
+      RpcAddress("localhost", 9999),
+      true))
     val executors = (0 until 3).map { i =>
       new ExecutorDescription(appId = i.toString, execId = i, 2, ExecutorState.RUNNING)
     }
@@ -776,7 +778,8 @@ class MasterSuite extends SparkFunSuite
       10,
       1024,
       "http://localhost:8080",
-      RpcAddress("localhost2", 10000)))
+      RpcAddress("localhost2", 10000),
+      true))
 
     eventually(timeout(10.seconds)) {
       assert(receivedMasterAddress === RpcAddress("localhost2", 10000))
@@ -806,7 +809,8 @@ class MasterSuite extends SparkFunSuite
         10,
         1234 * 3,
         "http://localhost:8080",
-        master.rpcEnv.address)
+        master.rpcEnv.address,
+        true)
       master.self.send(workerRegMsg)
       val driver = DeployTestUtils.createDriverDesc()
       // mimic DriverClient to send RequestSubmitDriver to master
@@ -849,7 +853,8 @@ class MasterSuite extends SparkFunSuite
         10,
         1024,
         "http://localhost:8080",
-        RpcAddress("localhost", 10000))
+        RpcAddress("localhost", 10000),
+        true)
       master.self.send(workerReg)
       worker
     }
@@ -910,7 +915,8 @@ class MasterSuite extends SparkFunSuite
         10,
         1024,
         "http://localhost:8080",
-        RpcAddress("localhost2", 10000))
+        RpcAddress("localhost2", 10000),
+        true)
       master.self.send(worker1Reg)
       val driver = DeployTestUtils.createDriverDesc().copy(supervise = true)
       master.self.askSync[SubmitDriverResponse](RequestSubmitDriver(driver))
@@ -934,7 +940,8 @@ class MasterSuite extends SparkFunSuite
         10,
         1024,
         "http://localhost:8081",
-        RpcAddress("localhost", 10001)))
+        RpcAddress("localhost", 10001),
+        true))
       eventually(timeout(10.seconds)) {
         assert(worker2.apps.nonEmpty)
       }
@@ -978,7 +985,7 @@ class MasterSuite extends SparkFunSuite
     val resources = Map(GPU -> new ResourceInformation(GPU, Array("0", "1", "2")),
       FPGA -> new ResourceInformation(FPGA, Array("f1", "f2", "f3")))
     val regMsg = RegisterWorker(worker.id, "localhost", 7077, worker.self, 10, 1024,
-      "http://localhost:8080", RpcAddress("localhost", 10000), resources)
+      "http://localhost:8080", RpcAddress("localhost", 10000), true, resources)
     masterRef.send(regMsg)
     eventually(timeout(10.seconds)) {
       status = masterRef.askSync[DriverStatusResponse](RequestDriverStatus(driverId))
@@ -1017,7 +1024,7 @@ class MasterSuite extends SparkFunSuite
         rName -> new ResourceInformation(rName, addresses)
       }
       val reg = RegisterWorker(worker.id, "localhost", 8077, worker.self, 10, 2048,
-        "http://localhost:8080", RpcAddress("localhost", 10000), resources)
+        "http://localhost:8080", RpcAddress("localhost", 10000), true, resources)
       master.send(reg)
       worker
     }

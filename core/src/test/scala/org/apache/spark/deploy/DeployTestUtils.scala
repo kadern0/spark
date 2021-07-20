@@ -60,7 +60,7 @@ private[deploy] object DeployTestUtils {
     val fpgaResource = new WorkerResourceInfo(FPGA, Seq("3", "4", "5"))
     val resources = Map(GPU -> gpuResource, FPGA -> fpgaResource)
     val workerInfo = new WorkerInfo("id", "host", 8080, 4, 1234, null,
-      "http://publicAddress:80", resources)
+      "http://publicAddress:80", true, resources)
     workerInfo.lastHeartbeat = JsonConstants.currTimeInMillis
     workerInfo
   }

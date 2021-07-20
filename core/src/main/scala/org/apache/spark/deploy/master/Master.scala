@@ -272,9 +272,9 @@ private[deploy] class Master(
 
     case RegisterWorker(
       id, workerHost, workerPort, workerRef, cores, memory, workerWebUiUrl,
-      masterAddress, resources) =>
-      logInfo("Registering worker %s:%d with %d cores, %s RAM".format(
-        workerHost, workerPort, cores, Utils.megabytesToString(memory)))
+      masterAddress, dedicated, resources) =>
+      logInfo("Registering worker %s:%d with %d cores, %s RAM, dedicated %s".format(
+        workerHost, workerPort, cores, Utils.megabytesToString(memory), dedicated))
       if (state == RecoveryState.STANDBY) {
         workerRef.send(MasterInStandby)
       } else if (idToWorker.contains(id)) {
@@ -282,7 +282,7 @@ private[deploy] class Master(
       } else {
         val workerResources = resources.map(r => r._1 -> WorkerResourceInfo(r._1, r._2.addresses))
         val worker = new WorkerInfo(id, workerHost, workerPort, cores, memory,
-          workerRef, workerWebUiUrl, workerResources)
+          workerRef, workerWebUiUrl, dedicated, workerResources)
         if (registerWorker(worker)) {
           persistenceEngine.addWorker(worker)
           workerRef.send(RegisteredWorker(self, masterWebUiUrl, masterAddress, false))
@@ -822,6 +822,7 @@ private[deploy] class Master(
       return
     }
     // Drivers take strict precedence over executors
+    
     val shuffledAliveWorkers = Random.shuffle(workers.toSeq.filter(_.state == WorkerState.ALIVE))
     val numWorkersAlive = shuffledAliveWorkers.size
     var curPos = 0
