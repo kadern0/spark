@@ -695,6 +695,9 @@ private[deploy] class Master(
       }
     }
 
+    // Set dedicated workers at the beggining of the array to ensure 
+    // we use all of them before start scheduling on opportunistic workers
+    usableWorkers.sortBy(_.dedicated).reverse
     // Keep launching executors until no more workers can accommodate any
     // more executors, or if we have reached this application's limits
     var freeWorkers = (0 until numUsable).filter(canLaunchExecutorForApp)
