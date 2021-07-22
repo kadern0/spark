@@ -45,6 +45,7 @@ private[spark] class WorkerInfo(
     val memory: Int,
     val endpoint: RpcEndpointRef,
     val webUiAddress: String,
+    val dedicated: Boolean,
     val resources: Map[String, WorkerResourceInfo])
   extends Serializable {
 

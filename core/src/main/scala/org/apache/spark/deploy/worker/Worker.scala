@@ -141,6 +141,7 @@ private[deploy] class Worker(
   private var registered = false
   private var connected = false
   private var decommissioned = false
+  private var dedicated = conf.get(WORKER_DEDICATED)
   // expose for test
   private[spark] val workerId = generateWorkerId()
   private val sparkHome =
@@ -449,6 +450,7 @@ private[deploy] class Worker(
       memory,
       workerWebUiUrl,
       masterEndpoint.address,
+      dedicated,
       resources))
   }
 

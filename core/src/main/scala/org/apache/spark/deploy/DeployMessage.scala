@@ -43,6 +43,7 @@ private[deploy] object DeployMessages {
    * @param memory the memory size of worker
    * @param workerWebUiUrl the worker Web UI address
    * @param masterAddress the master address used by the worker to connect
+   * @param dedicated whether node is dedicated
    * @param resources the resources of worker
    */
   case class RegisterWorker(
@@ -54,6 +55,7 @@ private[deploy] object DeployMessages {
       memory: Int,
       workerWebUiUrl: String,
       masterAddress: RpcAddress,
+      dedicated: Boolean,
       resources: Map[String, ResourceInformation] = Map.empty)
     extends DeployMessage {
     Utils.checkHost(host)

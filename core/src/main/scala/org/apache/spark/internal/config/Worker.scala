@@ -89,4 +89,10 @@ private[spark] object Worker {
       .version("3.2.0")
       .stringConf
       .createWithDefaultString("PWR")
+
+  val WORKER_DEDICATED = ConfigBuilder("spark.worker.dedicated")
+    .version("3.2.0")
+    .booleanConf
+    .createWithDefault(true)
+
 }
